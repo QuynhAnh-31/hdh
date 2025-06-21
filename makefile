@@ -33,7 +33,8 @@ objects = obj/loader.o \
           obj/kernel.o
 
 
-run: mykernel.iso
+run:
+	qemu-system-i386 -kernel bin/mykernel.bin
 
 obj/%.o: src/%.cpp
 	mkdir -p $(@D)
