@@ -40,11 +40,15 @@ obj/%.o: src/%.s
 	mkdir -p $(@D)
 	as $(ASPARAMS) -o $@ $<
 
-# Liên kết các object file thành kernel
+# Liên kết thành kernel
 mykernel.bin: linker.ld $(objects)
 	ld $(LDPARAMS) -T $< -o $@ $(objects)
 
-# Tạo file ISO có thể boot được
+# Chạy kernel trực tiếp bằng QEMU
+run: mykernel.bin
+	qemu-system-i386 -kernel mykernel.bin
+
+# Tạo file ISO boot được
 mykernel.iso: mykernel.bin
 	mkdir -p iso/boot/grub
 	cp mykernel.bin iso/boot/mykernel.bin
@@ -58,22 +62,15 @@ mykernel.iso: mykernel.bin
 	grub-mkrescue --output=mykernel.iso iso
 	rm -rf iso
 
-# Chạy kernel trực tiếp (chỉ nếu là ELF multiboot)
-runbin: mykernel.bin
-	qemu-system-i386 -kernel mykernel.bin
-
-# ✅ Chạy ISO với GRUB boot (nên dùng)
+# Chạy ISO bằng QEMU
 runiso: mykernel.iso
 	qemu-system-i386 -cdrom mykernel.iso
 
-# Cài kernel vào /boot (tuỳ chọn)
+# Cài vào thư mục /boot (tuỳ chọn)
 install: mykernel.bin
 	sudo cp $< /boot/mykernel.bin
 
-# Dọn dẹp
+# Xoá tất cả file sinh ra
 .PHONY: clean
 clean:
 	rm -rf obj mykernel.bin mykernel.iso
-# Chạy QEMU với ISO
-runiso: mykernel.iso
-	qemu-system-i386 -cdrom mykernel.iso
