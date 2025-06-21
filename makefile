@@ -30,10 +30,6 @@ objects = obj/loader.o \
           obj/net/tcp.o \
           obj/kernel.o
 
-# Chạy bằng QEMU
-run: mykernel.bin
-	qemu-system-i386 -kernel mykernel.bin
-
 # Biên dịch file .cpp thành .o
 obj/%.o: src/%.cpp
 	mkdir -p $(@D)
@@ -48,7 +44,7 @@ obj/%.o: src/%.s
 mykernel.bin: linker.ld $(objects)
 	ld $(LDPARAMS) -T $< -o $@ $(objects)
 
-# Tạo file ISO có thể boot được (tuỳ chọn)
+# Tạo file ISO có thể boot được
 mykernel.iso: mykernel.bin
 	mkdir -p iso/boot/grub
 	cp mykernel.bin iso/boot/mykernel.bin
@@ -62,11 +58,19 @@ mykernel.iso: mykernel.bin
 	grub-mkrescue --output=mykernel.iso iso
 	rm -rf iso
 
+# Chạy kernel trực tiếp (chỉ nếu là ELF multiboot)
+runbin: mykernel.bin
+	qemu-system-i386 -kernel mykernel.bin
+
+# ✅ Chạy ISO với GRUB boot (nên dùng)
+runiso: mykernel.iso
+	qemu-system-i386 -cdrom mykernel.iso
+
 # Cài kernel vào /boot (tuỳ chọn)
 install: mykernel.bin
 	sudo cp $< /boot/mykernel.bin
 
-# Xoá tất cả các file sinh ra
+# Dọn dẹp
 .PHONY: clean
 clean:
 	rm -rf obj mykernel.bin mykernel.iso
