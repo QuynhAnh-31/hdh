@@ -1,11 +1,9 @@
-
-# sudo apt-get install g++ binutils libc6-dev-i386
-# sudo apt-get install VirtualBox grub-legacy xorriso
-
+# Biên dịch hệ điều hành 32-bit
 GCCPARAMS = -m32 -Iinclude -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings
 ASPARAMS = --32
 LDPARAMS = -melf_i386
 
+# Danh sách các object file
 objects = obj/loader.o \
           obj/gdt.o \
           obj/memorymanagement.o \
@@ -32,25 +30,27 @@ objects = obj/loader.o \
           obj/net/tcp.o \
           obj/kernel.o
 
+# Chạy bằng QEMU
+run: mykernel.bin
+	qemu-system-i386 -kernel mykernel.bin
 
-run:
-	qemu-system-i386 -kernel bin/mykernel.bin
-
+# Biên dịch file .cpp thành .o
 obj/%.o: src/%.cpp
 	mkdir -p $(@D)
 	gcc $(GCCPARAMS) -c -o $@ $<
 
+# Biên dịch file .s thành .o
 obj/%.o: src/%.s
 	mkdir -p $(@D)
 	as $(ASPARAMS) -o $@ $<
 
+# Liên kết các object file thành kernel
 mykernel.bin: linker.ld $(objects)
 	ld $(LDPARAMS) -T $< -o $@ $(objects)
 
+# Tạo file ISO có thể boot được (tuỳ chọn)
 mykernel.iso: mykernel.bin
-	mkdir iso
-	mkdir iso/boot
-	mkdir iso/boot/grub
+	mkdir -p iso/boot/grub
 	cp mykernel.bin iso/boot/mykernel.bin
 	echo 'set timeout=0'                      > iso/boot/grub/grub.cfg
 	echo 'set default=0'                     >> iso/boot/grub/grub.cfg
@@ -62,9 +62,11 @@ mykernel.iso: mykernel.bin
 	grub-mkrescue --output=mykernel.iso iso
 	rm -rf iso
 
+# Cài kernel vào /boot (tuỳ chọn)
 install: mykernel.bin
 	sudo cp $< /boot/mykernel.bin
 
+# Xoá tất cả các file sinh ra
 .PHONY: clean
 clean:
 	rm -rf obj mykernel.bin mykernel.iso
