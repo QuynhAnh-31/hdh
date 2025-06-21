@@ -29,41 +29,59 @@ void printfChar(char c) {
 }
 
 void printInt(int n) {
-    if (n == 0) { printf("0"); return; }
-    if (n < 0) { printf("-"); n = -n; }
-    char buf[16]; int i = 0;
-    while (n > 0) { buf[i++] = '0' + (n % 10); n /= 10; }
-    while (i--) printfChar(buf[i]);
+    if (n == 0) {
+        printf("0");
+        return;
+    }
+    if (n < 0) {
+        printf("-");
+        n = -n;
+    }
+    char buf[16];
+    int i = 0;
+    while (n > 0) {
+        buf[i++] = '0' + (n % 10);
+        n /= 10;
+    }
+    while (i--) {
+        printfChar(buf[i]);
+    }
 }
 
 void giaiPTBac2(int a, int b, int c) {
-    printf("Giai phuong trinh bac 2: ");
+    printf("Giai phuong trinh bac 2:\n");
+    // In phương trình
     if (a != 1) printInt(a);
     printf("x^2 ");
     if (b >= 0) printf("+ "); printInt(b); printf("x ");
-    if (c >= 0) printf("+ "); printInt(c); printf(" = 0\n");
+    if (c >= 0) printf("+ "); printInt(c);
+    printf(" = 0\n");
 
-    int delta = b*b - 4*a*c;
+    int delta = b * b - 4 * a * c;
+
     if (delta < 0) {
         printf("Phuong trinh vo nghiem\n");
     } else if (delta == 0) {
-        int x = -b / (2*a);
-        printf("Phuong trinh co nghiem kep x = "); printInt(x); printf("\n");
+        int x = -b / (2 * a);
+        printf("Phuong trinh co nghiem kep: x = ");
+        printInt(x);
+        printf("\n");
     } else {
-        // Giải gần đúng
         int sqrt_delta = 1;
         while (sqrt_delta * sqrt_delta <= delta) ++sqrt_delta;
         --sqrt_delta;
-        int x1 = (-b + sqrt_delta) / (2*a);
-        int x2 = (-b - sqrt_delta) / (2*a);
-        printf("x1 = "); printInt(x1);
-        printf(", x2 = "); printInt(x2);
-        printf("\n");
+
+        int x1 = (-b + sqrt_delta) / (2 * a);
+        int x2 = (-b - sqrt_delta) / (2 * a);
+
+        printf("Phuong trinh co 2 nghiem:\n");
+        printf("x1 = "); printInt(x1); printf("\n");
+        printf("x2 = "); printInt(x2); printf("\n");
     }
 }
 
 // Hàm khởi động của hệ điều hành
 extern "C" void kernelMain(const void* multiboot_structure, uint32_t multiboot_magic) {
-    printf("hello worlds\n");
+    printf("hello worlds\n\n");
     giaiPTBac2(1, -3, 2);
 }
