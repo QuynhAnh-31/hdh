@@ -63,7 +63,7 @@ void giaiPTBac2(int a, int b, int c) {
 }
 
 // Hàm khởi động của hệ điều hành
-extern "C" void kernelMain() {
+extern "C" void kernelMain(const void* multiboot_structure, uint32_t multiboot_magic) {
     printf("hello worlds\n");
     giaiPTBac2(1, -3, 2);
 }
