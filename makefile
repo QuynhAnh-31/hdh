@@ -74,3 +74,6 @@ install: mykernel.bin
 .PHONY: clean
 clean:
 	rm -rf obj mykernel.bin mykernel.iso
+# Chạy QEMU với ISO
+runiso: mykernel.iso
+	qemu-system-i386 -cdrom mykernel.iso
